@@ -63,7 +63,55 @@ async function run() {
             res.send(result);
         })
 
-      
+        // update equipment by logged-in user only her equipment
+        // app.patch('/food/purchase/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const filter = { _id: new ObjectId(id) };
+        //     const options = { upsert: true };
+        //     const updatedPriceData = req.body;
+        //     const equipment = {
+        //         $set: {
+        //             price: updatedPriceData.price,
+        //         },
+        //     };
+        //     const result = await foodCollection.updateOne(filter, equipment, options);
+        //     res.send(result);
+        // });
+
+        app.patch("/food/:id", async (req, res) => {
+            try {
+              const id = req.params.id;
+          
+              // Validate ID format
+              // if (!ObjectId.isValid(id)) {
+              //   return res.status(400).send({ error: "Invalid ID format" });
+              // }
+          
+              const filter = { _id: new ObjectId(id) };
+              const updatedPriceData = req.body;
+          
+              // Validate data
+              if (!updatedPriceData.quantity || isNaN(updatedPriceData.quantity)) {
+                // return res.status(400).send({ error: "Invalid or missing price field" });
+              }
+
+              // const exists = await foodCollection.findOne(filter);
+              // if (!exists) {
+              //   return res.status(404).send({ error: "No document found with the specified ID" });
+              // }
+          
+              const update = { $set: { quantity: updatedPriceData.quantity } };
+              const result = await foodCollection.updateOne(filter, update);
+          
+              res.send(result);
+            } 
+            catch (error) {
+              console.error("Error updating price:", error);
+              res.status(500).send({ error: "An internal server error occurred" });
+            }
+          });
+          
+
 
 
 
