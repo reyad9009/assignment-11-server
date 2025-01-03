@@ -30,6 +30,7 @@ async function run() {
 
         // all food related apis
         const foodCollection = client.db('restaurant').collection('foods');
+        const foodPurchase = client.db('restaurant').collection('Purchase');
 
         // post data
         app.post('/food', async (req, res) => {
@@ -43,20 +44,26 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         });
-        app.get('/foods/details/:id', async(req, res) => {
+        app.get('/foods/details/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await foodCollection.findOne(query);
             res.send(result);
         })
-        app.get('/foods/details/purchase/:id', async(req, res) => {
+        app.get('/foods/details/purchase/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await foodCollection.findOne(query);
             res.send(result);
         })
 
+        app.post('/foods/purchase', async (req, res) => {
+            const newFood = req.body;
+            const result = await foodPurchase.insertOne(newFood);
+            res.send(result);
+        })
 
+      
 
 
 
