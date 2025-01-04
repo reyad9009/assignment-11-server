@@ -121,7 +121,28 @@ async function run() {
       res.send(result);
     })
 
-   
+    // update foods by logged-in user only her foods
+    app.put('/my-foods/update/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedFood = req.body;
+      const equipment = {
+        $set: {
+          foodName: updatedFood.foodName,
+          image: updatedFood.image,
+          category: updatedFood.category,
+          quantity: updatedFood.quantity,
+          price: updatedFood.price,
+          foodOrigin: updatedFood.foodOrigin,
+          description: updatedFood.description,
+          email: updatedFood.email,
+          name: updatedFood.name,
+        },
+      };
+      const result = await foodCollection.updateOne(filter, equipment, options);
+      res.send(result);
+    });
 
   } finally {
     // Ensures that the client will close when you finish/error
