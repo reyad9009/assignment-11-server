@@ -153,7 +153,12 @@ async function run() {
     })
     
     // Get orders data by logged-in user's email
-    
+    app.get('/my-orders/:email', async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const result = await userFoodPurchase.find(filter).toArray();
+      res.send(result)
+    });
 
 
 
