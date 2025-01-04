@@ -31,6 +31,7 @@ async function run() {
     // all food related apis
     const foodCollection = client.db('restaurant').collection('foods');
     const foodPurchase = client.db('restaurant').collection('Purchase');
+    const userFoodPurchase = client.db('restaurant').collection('userPurchase');
 
     // post data
     app.post('/food', async (req, res) => {
@@ -143,6 +144,18 @@ async function run() {
       const result = await foodCollection.updateOne(filter, equipment, options);
       res.send(result);
     });
+
+    //for user purchase
+    app.post('/food/Purchase/user', async (req, res) => {
+      const newFood = req.body;
+      const result = await userFoodPurchase.insertOne(newFood);
+      res.send(result);
+    })
+    
+    // Get orders data by logged-in user's email
+    
+
+
 
   } finally {
     // Ensures that the client will close when you finish/error
