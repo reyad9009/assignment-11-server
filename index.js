@@ -104,15 +104,24 @@ async function run() {
       res.send(result);
     });
 
-    
-// user system
-     // Get equipment data by logged-in user's email
-     app.get('/my-foods/:email', async (req, res) => {
+
+    // user system
+    // Get equipment data by logged-in user's email
+    app.get('/my-foods/:email', async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const result = await foodCollection.find(filter).toArray();
       res.send(result)
-  });
+    });
+
+    app.get('/my-foods/update/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await foodCollection.findOne(query);
+      res.send(result);
+    })
+
+   
 
   } finally {
     // Ensures that the client will close when you finish/error
