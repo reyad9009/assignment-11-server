@@ -57,7 +57,7 @@ async function run() {
       res.send(result);
     })
 
-    
+
     // when user click purchase button then store purchase details and also update quantity in db
     app.post("/foods/purchase", async (req, res) => {
       const { foodId, quantity } = req.body;
@@ -87,22 +87,12 @@ async function run() {
       }
     });
 
-    // update data by every purchase
-    // app.patch("/food/purchase/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const filter = { _id: new ObjectId(id) };
-    //   const updatedQuantity = req.body;
-    //   const update = { $inc: { quantity: updatedQuantity.quantity } };
-    //   const result = await foodPurchase.updateOne(filter, update);
-    //   res.send(result);
-    // });
-
-    // app.get('/foods/purchase/:foodId', async (req, res) => {
-    //   const foodId = req.params.foodId;
-    //   const query = { foodId: foodId }
-    //   const result = await foodPurchase.findOne(query);
-    //   res.send(result);
-    // });
+    app.get('/foods/purchase/:foodId', async (req, res) => {
+      const foodId = req.params.foodId;
+      const query = { foodId: foodId }
+      const result = await foodPurchase.findOne(query);
+      res.send(result);
+    });
 
     // when user click purchase button then update quantity
     app.patch("/food/:id", async (req, res) => {
