@@ -151,7 +151,7 @@ async function run() {
       const result = await userFoodPurchase.insertOne(newFood);
       res.send(result);
     })
-    
+
     // Get orders data by logged-in user's email
     app.get('/my-orders/:email', async (req, res) => {
       const email = req.params.email;
@@ -160,6 +160,13 @@ async function run() {
       res.send(result)
     });
 
+    //logged use
+    app.delete('/my-orders/delete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await userFoodPurchase.deleteOne(query);
+      res.send(result);
+    })
 
 
   } finally {
