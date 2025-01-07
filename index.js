@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    //await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     //console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -197,7 +197,7 @@ async function run() {
     
         res.send(result);
       } catch (error) {
-        console.error("Error fetching top-selling foods:", error);
+        //console.error("Error fetching top-selling foods:", error);
         res.status(500).send({ error: "Failed to fetch data" });
       }
     });
@@ -217,7 +217,7 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  //console.log(`food is waiting at: ${port}`)
+  console.log(`food is waiting at: ${port}`)
 })
 
 
