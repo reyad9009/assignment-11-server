@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    //await client.connect();
+    await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     //console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -60,39 +60,28 @@ async function run() {
 
     // when user click purchase button then store purchase details and also update quantity in db
     app.post("/foods/purchase", async (req, res) => {
-      const { foodId, quantity } = req.body;
-      try {
-        // Check if the food item already exists
-        const existingFood = await foodPurchase.findOne({ foodId });
-        if (existingFood) {
-          // Update only the quantity
-          const updateResult = await foodPurchase.updateOne(
-            { foodId },
-            { $inc: { quantity: parseInt(quantity, 10) } }
-          );
-          res.status(200).json({
-            updatedQuantity: existingFood.quantity + parseInt(quantity, 10),
-          });
-        }
-        else {
-          const newFood = req.body;
-          const result = await foodPurchase.insertOne(newFood);
-          res.send(result);
-
-        }
-
-      } catch (error) {
-        //console.error("Error handling food purchase:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-      }
+      const newFood = req.body;
+      const result = await foodPurchase.insertOne(newFood);
+      res.send(result);
     });
 
     app.get('/foods/purchase/:foodId', async (req, res) => {
       const foodId = req.params.foodId;
-      const query = { foodId: foodId }
-      const result = await foodPurchase.findOne(query);
-      res.send(result);
+
+      const result = await foodPurchase.aggregate([
+        { $match: { foodId: foodId } },
+        // Group by foodId to calculate the total quantity sold for each food item
+        {
+          $group: {
+            _id: "$foodId",
+            totalQuantity: { $sum: "$quantity" },
+          }
+        },
+      ]).toArray();
+      res.send(result[0] || { totalQuantity: 0 });
+
     });
+
 
     // when user click purchase button then update quantity
     app.patch("/food/:id", async (req, res) => {
@@ -155,7 +144,7 @@ async function run() {
     app.get('/my-orders/:email', async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
-      const result = await userFoodPurchase.find(filter).toArray();
+      const result = await foodPurchase.find(filter).toArray();
       res.send(result)
     });
 
@@ -163,18 +152,9 @@ async function run() {
     app.delete('/my-orders/delete/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
-      const result = await userFoodPurchase.deleteOne(query);
+      const result = await foodPurchase.deleteOne(query);
       res.send(result);
     })
-
-    // for home page
-    //get 6 data from mongodb
-    // app.get('/home-foods', async (req, res) => {
-    //   const cursor = foodPurchase.find().limit(6);
-    //   // const cursor = EquipmentCollection.find();
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // })
 
     app.get('/home-foods', async (req, res) => {
       try {
@@ -194,15 +174,13 @@ async function run() {
           // Limit to top 6 items
           { $limit: 6 }
         ]).toArray();
-    
+
         res.send(result);
       } catch (error) {
         //console.error("Error fetching top-selling foods:", error);
         res.status(500).send({ error: "Failed to fetch data" });
       }
     });
-    
-
 
   } finally {
     // Ensures that the client will close when you finish/error
@@ -222,15 +200,3 @@ app.listen(port, () => {
 
 
 
-
-
-
-
-// foodName: "Croissant", 
-// price: "2.50", 
-// quantity: 10
-// name: "Tarek Rahman", 
-// email: "tarekhossen105@gmail.com", 
-// date: "01/05/2025", 
-// foodId: "67781b0d46750b4b54bcfe55", 
-// image: "https://i.ibb.co.com/b2qsFbM/Croissant.png" 
